@@ -1,5 +1,4 @@
-ARG FROM=debian:buster-slim
-FROM ${FROM}
+FROM ubuntu:focal
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GIT_VERSION="2.26.2"
