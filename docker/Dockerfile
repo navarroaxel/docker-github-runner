@@ -1,8 +1,6 @@
-ARG FROM=debian:buster-slim
-FROM ${FROM}
+FROM ubuntu:focal
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG GIT_VERSION="2.26.2"
 ARG GH_RUNNER_VERSION
 ARG DOCKER_COMPOSE_VERSION="1.27.4"
 
@@ -31,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     apt-get install -y \
         curl \
         unzip \
+        git \
         apt-transport-https \
         ca-certificates \
         software-properties-common \
@@ -42,33 +41,21 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
         zlib1g-dev \
         gettext \
         liblttng-ust0 \
-        libcurl4-openssl-dev \
-        openssh-client && \
+        libcurl4-openssl-dev && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu focal stable" && \
+    apt-get update && \
+    apt-get install -y docker-ce docker-ce-cli containerd.io --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chmod 644 /etc/supervisor/conf.d/supervisord.conf
 
-# Install Docker CLI
-RUN curl -fsSL https://get.docker.com -o- | sh && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
-
 # Install Docker-Compose
 RUN curl -L -o /usr/local/bin/docker-compose \
     "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" && \
     chmod +x /usr/local/bin/docker-compose
-
-RUN cd /tmp && \
-    curl -sL -o git.tgz \
-    https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz && \
-    tar zxf git.tgz  && \
-    cd git-${GIT_VERSION}  && \
-    ./configure --prefix=/usr  && \
-    make && \
-    make install && \
-    rm -rf /tmp/*
 
 RUN mkdir -p /home/runner ${AGENT_TOOLSDIRECTORY}
 
