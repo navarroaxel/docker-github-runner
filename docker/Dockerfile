@@ -1,7 +1,6 @@
 FROM ubuntu:focal
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG GIT_VERSION="2.26.2"
 ARG GH_RUNNER_VERSION
 ARG DOCKER_COMPOSE_VERSION="1.24.1"
 
@@ -30,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     apt-get install -y \
         curl \
         unzip \
+        git \
         apt-transport-https \
         ca-certificates \
         software-properties-common \
@@ -47,16 +47,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chmod 644 /etc/supervisor/conf.d/supervisord.conf
-
-RUN cd /tmp && \
-    curl -sL -o git.tgz \
-    https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz && \
-    tar zxf git.tgz  && \
-    cd git-${GIT_VERSION}  && \
-    ./configure --prefix=/usr  && \
-    make && \
-    make install && \
-    rm -rf /tmp/*
 
 RUN mkdir -p /home/runner ${AGENT_TOOLSDIRECTORY}
 
