@@ -41,7 +41,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
         zlib1g-dev \
         gettext \
         liblttng-ust0 \
-        libcurl4-openssl-dev && \
+        libcurl4-openssl-dev \
+        ruby-dev && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
     add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu focal stable" && \
     apt-get update && \
@@ -71,6 +72,5 @@ RUN GH_RUNNER_VERSION=${GH_RUNNER_VERSION:-$(curl --silent "https://api.github.c
     && apt-get clean
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
